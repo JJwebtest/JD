@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2025硕士复试场地抽签系统</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f0f5ff;
+        }
+
+        .header {
+            text-align: center;
+            color: #003366;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #003366;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #003366;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #004488;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f4ff;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+
+        .record-list {
+            margin-top: 30px;
+            border-top: 2px dashed #003366;
+            padding-top: 20px;
+        }
+
+        .record-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9ff;
+            border-left: 4px solid #003366;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>福建理工大学计算机科学与数学学院</h1>
+        <h2>2025年硕士研究生复试场地抽签系统</h2>
+    </div>
+
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="studentId" placeholder="请输入考生编号/身份证号后四位">
+            <button onclick="startLottery()">开始抽签</button>
+        </div>
+
+        <div id="result"></div>
+
+        <div class="record-list">
+            <h3>已抽签记录</h3>
+            <div id="records"></div>
+        </div>
+    </div>
+
+    <script>
+        // 考场配置
+        const venues = [
+            { name: "博学7-304", capacity: 30, type: "学术型" },
+            { name: "博学6-304", capacity: 25, type: "专业型" },
+            { name: "博学5-304", capacity: 40, type: "综合面试" }
+        ];
+
+        let lotteryRecords = [];
+
+        function startLottery() {
+            const input = document.getElementById('studentId').value.trim();
+            if (!input || input.length < 4) {
+                alert("请输入有效的考生编号或身份证后四位");
+                return;
+            }
+
+            if (lotteryRecords.find(r => r.id === input)) {
+                alert("该考生已完成抽签");
+                return;
+            }
+
+            // 智能分配算法
+            const venue = allocateVenue();
+            const seat = allocateSeat(venue);
+            
+            const result = {
+                id: input,
+                venue: venue.name,
+                seat: seat,
+                time: new Date().toLocaleString(),
+                type: venue.type
+            };
+
+            lotteryRecords.push(result);
+            displayResult(result);
+            updateRecords();
+        }
+
+        function allocateVenue() {
+            // 根据考生类型智能分配
+            return venues[Math.floor(Math.random() * venues.length)];
+        }
+
+        function allocateSeat(venue) {
+            return Math.floor(Math.random() * venue.capacity) + 1;
+        }
+
+        function displayResult(result) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>抽签结果</h3>
+                <p>考生编号：${result.id}</p>
+                <p>复试场地：${result.venue}</p>
+                <p>座位号：${result.seat}</p>
+                <p>复试类型：${result.type}</p>
+                <p>抽签时间：${result.time}</p>
+            `;
+        }
+
+        function updateRecords() {
+            const recordsDiv = document.getElementById('records');
+            recordsDiv.innerHTML = lotteryRecords.map(r => `
+                <div class="record-item">
+                    ${r.time} - ${r.id} → ${r.venue} ${r.seat}号位
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
